@@ -61,7 +61,7 @@ export async function updateIncome(req, res) {
   const { description, amount, category, date } = req.body;
 
   try {
-    const updatedIncome = await incomeModel.findOneAndUpdate(
+    const updatedIncome = await incomeModel.findByIdAndUpdate(
       {
         _id: id,
         userId,
@@ -95,7 +95,7 @@ export async function updateIncome(req, res) {
 // delete income
 export async function deleteIncome(req, res) {
   try {
-    const income = await incomeModel.findOneAndDelete({
+    const income = await incomeModel.findByIdAndDelete({
       _id: req.params.id,
     });
 
