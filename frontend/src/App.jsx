@@ -1,8 +1,33 @@
+import React, { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Layout from "./components/Layout.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+
 const App = () => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const navigate = useNavigate();
+
+  const clearAuth = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    setUser(null);
+    setToken(null);
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    navigate("/login");
+  };
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Project Rajnish!</h1>
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Dashboard />} />
+      </Route>
+    </Routes>
   );
 };
 

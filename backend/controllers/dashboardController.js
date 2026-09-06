@@ -1,5 +1,5 @@
-import incomeModel from "../models/incomeModel";
-import expenseModel from "../models/expenseModel";
+import incomeModel from "../models/incomeModel.js";
+import expenseModel from "../models/expenseModel.js";
 
 export async function getDashboardOverview(req, res) {
   const userId = req.user.id;
