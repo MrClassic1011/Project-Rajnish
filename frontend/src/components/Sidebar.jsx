@@ -19,7 +19,7 @@ const MENU_ITEMS = [
   { text: "Dashboard", path: "/", icon: <Home size={20} /> },
 
   // Income = Best Prices
-  { text: "Best Prices", path: "/income", icon: <ArrowUp size={20} /> },
+  { text: "Income", path: "/income", icon: <ArrowUp size={20} /> },
   { text: "Expenses", path: "/expense", icon: <ArrowDown size={20} /> },
   { text: "Profile", path: "/profile", icon: <User size={20} /> },
 ];

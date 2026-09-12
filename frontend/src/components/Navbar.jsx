@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { navbarStyles } from "../assets/dummyStyles";
 import img1 from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
