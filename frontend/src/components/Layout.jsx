@@ -2,11 +2,15 @@ import {
   ArrowDown,
   ArrowUp,
   Car,
+  ChevronDown,
+  ChevronUp,
   Clock,
   CreditCard,
   DollarSign,
   Gift,
   Home,
+  Info,
+  PieChart,
   PiggyBank,
   RefreshCw,
   ShoppingCart,
@@ -20,6 +24,7 @@ import Sidebar from "./Sidebar.jsx";
 import { Activity, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Outlet } from "react-router-dom";
+import { number } from "framer-motion";
 
 const API_BASE = "http://localhost:4000/api";
 
@@ -436,6 +441,134 @@ const Layout = ({ onLogout, user }) => {
                     className={styles.transactions.refreshIcon(loading)}
                   />
                 </button>
+              </div>
+
+              <div className={styles.transactions.dataStackingInfo}>
+                <Info className={styles.transactions.dataStackingIcon} />
+                <span>Transactions are stacked by date (newest first)</span>
+              </div>
+
+              <div className={styles.transactions.listContainer}>
+                {displayedTransactions.map((transaction) => {
+                  const { id, type, category, description, date, amount } =
+                    transaction;
+                  return (
+                    <div
+                      key={id}
+                      className={styles.transactions.transactionItem}
+                    >
+                      <div className="flex items-center gap-1 md:gap-4 lg:gap-3">
+                        <div
+                          className={`p-2 rounded-lg ${styles.colors.transaction.bg(
+                            type,
+                          )}`}
+                        >
+                          {CATEGORY_ICONS[category] || (
+                            <DollarSign className={styles.transactions.icon} />
+                          )}
+                        </div>
+                        <div className={styles.transactions.details}>
+                          <p className={styles.transactions.description}>
+                            {description}
+                          </p>
+
+                          <p className={styles.transactions.meta}>
+                            {new Date(date).toLocaleDateString()}
+                            <span className="ml-2 capitalize ">{category}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <span className={styles.colors.transaction.text(type)}>
+                        {type === "income" ? "+" : "-"}${Number(amount)}
+                      </span>
+                    </div>
+                  );
+                })}
+
+                {transactions.length === 0 ? (
+                  <div className={styles.transactions.emptyState}>
+                    <div className={styles.transactions.emptyIconContainer}>
+                      <Clock className={styles.transactions.emptyIcon} />
+                    </div>
+                    <p className={styles.transactions.emptyText}>
+                      No recent transactions!
+                    </p>
+                  </div>
+                ) : (
+                  <div className={styles.transactions.viewAllContainer}>
+                    <button
+                      onClick={() =>
+                        setShowAllTransactions(!showAllTransactions)
+                      }
+                      className={styles.transactions.viewAllButton}
+                    >
+                      {showAllTransactions ? (
+                        <>
+                          <ChevronUp className=" w-5 h-5" />
+                          Show Less
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className=" w-5 h-5" />
+                          View All Transactions( {transactions.length})
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/** spending by category card*/}
+            <div className={styles.cards.base}>
+              <h3 className={styles.categories.title}>
+                <PieChart className={styles.categories.titleIcon} />
+                Spending by Category
+              </h3>
+
+              <div className={styles.categories.list}>
+                {topCategories.map(([catergory, amount]) => (
+                  <div
+                    key={catergory}
+                    className={styles.categories.categoryItem}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={styles.categories.categoryIconContainer}>
+                        {CATEGORY_ICONS[catergory] || (
+                          <DollarSign
+                            className={styles.categories.categoryIcon}
+                          />
+                        )}
+                      </div>
+                      <span className={styles.categories.categoryName}>
+                        {catergory}
+                      </span>
+                    </div>
+                    <span className={styles.categories.categoryAmount}>
+                      ${amount}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.categories.summaryContainer}>
+                <div className={styles.categories.summaryGrid}>
+                  <div className={styles.categories.summaryIncomeCard}>
+                    <p className={styles.categories.summaryTitle}>
+                      Total Income
+                    </p>
+                    <p className={styles.categories.summaryValue}>
+                      ${stats.allTimeIncome.toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div className={styles.categories.summaryExpenseCardCard}>
+                    <p className={styles.categories.summaryTitle}>
+                      Total Expense
+                    </p>
+                    <p className={styles.categories.summaryValue}>
+                      ${stats.allTimeExpenses.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
