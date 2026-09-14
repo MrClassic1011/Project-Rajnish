@@ -260,7 +260,7 @@ const Sidebar = ({ user, isCollapsed, setIsCollapsed }) => {
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-gray-800">
-                        {user}
+                        {username}
                       </h2>
                       <p className="text-sm text-grey-500"> {email}</p>
                     </div>

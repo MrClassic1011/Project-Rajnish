@@ -16,7 +16,7 @@ const Login = ({ onLogin, API_URL = "http://localhost:4000/api" }) => {
   // to fetch profile
   const fetchProfile = async (token) => {
     if (!token) return null;
-    const res = await axios.get(`${API_URL}/api/user/me`, {
+    const res = await axios.get(`${API_URL}/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
@@ -39,7 +39,7 @@ const Login = ({ onLogin, API_URL = "http://localhost:4000/api" }) => {
     setError("");
     try {
       const res = await axios.post(
-        `${API_URL}/api/user/login`,
+        `${API_URL}/users/login`,
         { email, password },
         { headers: { "Content-Type": "application/json" } },
       );
@@ -189,7 +189,6 @@ const Login = ({ onLogin, API_URL = "http://localhost:4000/api" }) => {
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className={loginStyles.checkbox}
-                required
               />
               <label htmlFor="remember" className={loginStyles.checkboxLabel}>
                 Remember Me

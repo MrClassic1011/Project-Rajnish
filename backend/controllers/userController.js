@@ -7,7 +7,7 @@ const JWT_SECRET = "your_jwt_secret_key"; // Replace with your own secret key
 const JWT_EXPIRES_IN = "24h"; // Token expiration time
 
 const createToken = (userId) => {
-  jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
 // Create a new user
