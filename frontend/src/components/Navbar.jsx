@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { navbarStyles } from "../assets/dummyStyles";
-import img1 from "../assets/logo.png";
+import img1 from "../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import axios from "axios";
