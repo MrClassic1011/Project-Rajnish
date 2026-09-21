@@ -64,7 +64,7 @@ export async function updateExpense(req, res) {
         _id: id,
         userId,
       },
-      { description, amount, category, date: Date(date) },
+      { description, amount, category, date: new Date(date) },
       { new: true },
     );
 

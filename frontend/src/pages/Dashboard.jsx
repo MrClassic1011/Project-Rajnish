@@ -21,19 +21,39 @@ import axios from "axios";
 import {
   ArrowDown,
   BarChart2,
+  ChevronDown,
+  TrendingUp as ProfitIcon,
+  PieChart as PieChartIcon,
+  ChevronUp,
+  DollarSign,
   PiggyBank,
   Plus,
+  ShoppingCart,
   TrendingDown,
   TrendingUp,
   Wallet,
 } from "lucide-react";
 import FinancialCard from "../components/FinancialCard";
+import GaugeCard from "../components/GaugeCard";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
+import AddTransactionModal from "../components/Add";
 
 const API_BASE = "http://localhost:4000/api";
 
 const getAuthHeader = () => {
   const token =
-    localStorage.getItem("token") || localStorage.getItem("authToken");
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("token") ||
+    localStorage.getItem("authToken") ||
+    sessionStorage.getItem("authToken");
+
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -359,11 +379,9 @@ const Dashboard = () => {
           headers: getAuthHeader(),
         });
       } else {
-        (await axios.post(`${API_BASE}/expense/add`),
-          payload,
-          {
-            headers: getAuthHeader(),
-          });
+        await axios.post(`${API_BASE}/expense/add`, payload, {
+          headers: getAuthHeader(),
+        });
       }
       await refreshTransactions();
       await fetchDashboardOverview();
@@ -506,6 +524,261 @@ const Dashboard = () => {
         />
       </div>
       {/**Gauges */}
+      <div className={dashboardStyles.gaugeGrid}>
+        {gaugeData.map((gauge) => (
+          <GaugeCard
+            key={gauge.name}
+            gauge={gauge}
+            colorInfo={GAUGE_COLORS[gauge.name]}
+            timeFrameLabel={timeFrameRange.label}
+          />
+        ))}
+      </div>
+
+      {/* Expense distribution pie - Hidden on mobile */}
+      <div className={dashboardStyles.pieChartContainer}>
+        <div className={dashboardStyles.pieChartHeader}>
+          <h3 className={dashboardStyles.pieChartTitle}>
+            <PieChartIcon className="w-6 h-6 text-teal-500" />
+            Expense Distribution
+            <span className={dashboardStyles.listSubtitle}>
+              {" "}
+              ({timeFrameRange.label})
+            </span>
+          </h3>
+        </div>
+
+        <div className={dashboardStyles.pieChartHeight}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart className={chartStyles.pieChart}>
+              <Pie
+                data={financialOverviewData}
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={110}
+                paddingAngle={2}
+                dataKey="value"
+                label={({ name, percent }) =>
+                  `${name}: ${Math.round(percent * 100)}%`
+                }
+                labelLine={false}
+              >
+                {financialOverviewData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                    stroke="#fff"
+                    strokeWidth={2}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value) => [
+                  `$${Math.round(value).toLocaleString()}`,
+                  "Amount",
+                ]}
+                contentStyle={dashboardStyles.tooltipContent}
+                itemStyle={dashboardStyles.tooltipItem}
+              />
+              <Legend
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                formatter={(v) => (
+                  <span className={dashboardStyles.legendText}>{v}</span>
+                )}
+                iconSize={10}
+                iconType="circle"
+                wrapperStyle={dashboardStyles.legendWrapper}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className={dashboardStyles.listsGrid}>
+        {/* Income Column */}
+        <div className={dashboardStyles.listContainer}>
+          <div className={dashboardStyles.listHeader}>
+            <h3 className={dashboardStyles.listTitle}>
+              <ProfitIcon className="w-6 h-6 text-green-500" /> Recent Income{" "}
+              <span className={dashboardStyles.listSubtitle}>
+                {" "}
+                ({timeFrameRange.label})
+              </span>
+            </h3>
+            <span className={dashboardStyles.incomeCountBadge}>
+              {incomeListForDisplay.length} records
+            </span>
+          </div>
+
+          <div className={dashboardStyles.transactionList}>
+            {displayedIncome.map((transaction) => {
+              const IconComponent =
+                INCOME_CATEGORY_ICONS[transaction.category] ||
+                INCOME_CATEGORY_ICONS.Other;
+              return (
+                <div
+                  key={transaction.id}
+                  className={dashboardStyles.incomeTransactionItem}
+                >
+                  <div className={dashboardStyles.transactionContent}>
+                    <div className={dashboardStyles.incomeIconContainer}>
+                      {IconComponent}
+                    </div>
+                    <div>
+                      <p className={dashboardStyles.transactionDescription}>
+                        {transaction.description}
+                      </p>
+                      <p className={dashboardStyles.transactionCategory}>
+                        {transaction.category}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={dashboardStyles.transactionAmount}>
+                    <p className={dashboardStyles.incomeAmount}>
+                      +${Math.abs(transaction.amount).toLocaleString()}
+                    </p>
+                    <p className={dashboardStyles.transactionDate}>
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+
+            {incomeListForDisplay.length === 0 && (
+              <div className={dashboardStyles.emptyState}>
+                <div
+                  className={dashboardStyles.emptyIconContainer("bg-green-50")}
+                >
+                  <DollarSign className="w-8 h-8 text-green-400" />
+                </div>
+                <p className={dashboardStyles.emptyText}>
+                  No income transactions
+                </p>
+              </div>
+            )}
+
+            {incomeListForDisplay.length > 3 && (
+              <div className={dashboardStyles.viewAllContainer}>
+                <button
+                  onClick={() => setShowAllIncome(!showAllIncome)}
+                  className={dashboardStyles.viewAllButton}
+                >
+                  {showAllIncome ? (
+                    <>
+                      <ChevronUp className="w-5 h-5" />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-5 h-5" />
+                      View All Income ({incomeListForDisplay.length})
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Expense Column */}
+        <div className={dashboardStyles.listContainer}>
+          <div className={dashboardStyles.listHeader}>
+            <h3 className="text-lg md:text-xl lg:text-xl xl:text-xl font-bold text-gray-800 md:mt-3 mt-3 flex items-center gap-3">
+              <ArrowDown className="w-6 h-6 text-orange-500" /> Recent Expenses{" "}
+              <span className={dashboardStyles.listSubtitle}>
+                {" "}
+                ({timeFrameRange.label})
+              </span>
+            </h3>
+            <span className={dashboardStyles.expenseCountBadge}>
+              {expenseListForDisplay.length} records
+            </span>
+          </div>
+
+          <div className={dashboardStyles.transactionList}>
+            {displayedExpense.map((transaction) => {
+              const IconComponent =
+                EXPENSE_CATEGORY_ICONS[transaction.category] ||
+                EXPENSE_CATEGORY_ICONS.Other;
+              return (
+                <div
+                  key={transaction.id}
+                  className={dashboardStyles.expenseTransactionItem}
+                >
+                  <div className={dashboardStyles.transactionContent}>
+                    <div className={dashboardStyles.expenseIconContainer}>
+                      {IconComponent}
+                    </div>
+                    <div>
+                      <p className={dashboardStyles.transactionDescription}>
+                        {transaction.description}
+                      </p>
+                      <p className={dashboardStyles.transactionCategory}>
+                        {transaction.category}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={dashboardStyles.transactionAmount}>
+                    <p className={dashboardStyles.expenseAmount}>
+                      -${Math.abs(transaction.amount).toLocaleString()}
+                    </p>
+                    <p className={dashboardStyles.transactionDate}>
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+
+            {expenseListForDisplay.length === 0 && (
+              <div className={dashboardStyles.emptyState}>
+                <div
+                  className={dashboardStyles.emptyIconContainer("bg-orange-50")}
+                >
+                  <ShoppingCart className="w-8 h-8 text-orange-400" />
+                </div>
+                <p className={dashboardStyles.emptyText}>
+                  No expense transactions
+                </p>
+              </div>
+            )}
+
+            {expenseListForDisplay.length > 3 && (
+              <div className={dashboardStyles.viewAllContainer}>
+                <button
+                  onClick={() => setShowAllExpense(!showAllExpense)}
+                  className={dashboardStyles.viewAllButton}
+                >
+                  {showAllExpense ? (
+                    <>
+                      <ChevronUp className="w-5 h-5" />
+                      Show Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="w-5 h-5" />
+                      View All Expenses ({expenseListForDisplay.length})
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <AddTransactionModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        newTransaction={newTransaction}
+        setNewTransaction={setNewTransaction}
+        handleAddTransaction={handleAddTransaction}
+        loading={loading}
+      />
     </div>
   );
 };

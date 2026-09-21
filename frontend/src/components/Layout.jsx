@@ -560,7 +560,7 @@ const Layout = ({ onLogout, user }) => {
                     </p>
                   </div>
 
-                  <div className={styles.categories.summaryExpenseCardCard}>
+                  <div className={styles.categories.summaryExpenseCard}>
                     <p className={styles.categories.summaryTitle}>
                       Total Expense
                     </p>

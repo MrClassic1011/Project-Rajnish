@@ -18,7 +18,7 @@ export async function addIncome(req, res) {
       description,
       amount,
       category,
-      date: Date(date),
+      date: new Date(date),
     });
 
     await newIncome.save();
@@ -66,7 +66,7 @@ export async function updateIncome(req, res) {
         _id: id,
         userId,
       },
-      { description, amount, category, date: Date(date) },
+      { description, amount, category, date: new Date(date) },
       { new: true },
     );
 
